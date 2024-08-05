@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预测睡眠效率</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 10px;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        input, select {
+            padding: 15px;
+            font-size: 18px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+        .hint {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+        .output {
+            padding: 100px;
+            font-size: 18px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 15px;
+            position: relative;
+        }
+        .output p {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        .links {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .links a {
+            padding: 10px;
+            text-align: center;
+            background-color: #0066cc;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .links a:hover {
+            background-color: #004999;
+        }
+        button {
+            padding: 15px;
+            font-size: 18px;
+            background-color: #0066cc;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+        }
+        button:hover {
+            background-color: #004999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>预测睡眠效率</h1>
+        <form id="prediction-form">
+            <label for="age">年龄:</label>
+            <input type="number" id="age" name="age" min="0" max="100" required>
+            <div class="hint">推荐输入20-60岁</div>
+
+            <label for="gender">性别:</label>
+            <select id="gender" name="gender" required>
+                <option value="0">男性</option>
+                <option value="1">女性</option>
+            </select>
+
+            <button type="submit">预测</button>
+        </form>
+        <div class="output" id="prediction-output">
+            <p id="output-text"></p>
+        </div>
+        <div class="links">
+            <a href="linear-regression">多元线性回归</a>
+            <a href="neural-network">神经网络回归</a>
+            <a href="xgboost">XGBoost回归</a>
+            <a href="random-forest">随机森林回归</a>
+            <a href="others">其他</a>
+        </div>
+    </div>
+    <script>
+        document.getElementById('prediction-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const age = document.getElementById('age').value;
+            const gender = document.getElementById('gender').value;
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `age=${age}&gender=${gender}`,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.prediction !== undefined) {
+                    document.getElementById('output-text').innerText = '预测的睡眠效率: ' + data.prediction;
+                } else {
+                    document.getElementById('output-text').innerText = '错误: ' + data.error;
+                }
+            })
+            .catch(error => {
+                document.getElementById('output-text').innerText = '请求失败';
+            });
+        });
+    </script>
+</body>
+</html>
